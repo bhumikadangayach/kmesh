@@ -76,7 +76,7 @@ func waitForPath(path string) error {
 		retryDelay = 500 * time.Millisecond
 	)
 	var err error
-	for i := 0; i < maxRetries; i++ {
+	for i := 0; i <= maxRetries; i++ {
 		if _, err = os.Stat(path); err == nil {
 			return nil
 		}
