@@ -123,11 +123,11 @@ func getVersion(client kube.CLIClient, podName string) (version version.Info, er
 
 	url := fmt.Sprintf("http://%s/version", fw.Address())
 	httpClient := utils.NewAdminHTTPClient()
-        resp, err := httpClient.Get(url)
-        if err != nil {
-                log.Errorf("failed to make HTTP request: %v", err)
-                return
-        }
+	resp, err := httpClient.Get(url)
+	if err != nil {
+		log.Errorf("failed to make HTTP request: %v", err)
+		return
+	}
 	defer resp.Body.Close()
 
 	body, rerr := io.ReadAll(resp.Body)
@@ -140,6 +140,12 @@ func getVersion(client kube.CLIClient, podName string) (version version.Info, er
 	if uerr := json.Unmarshal(body, &version); uerr != nil {
 		log.Errorf("failed to unmarshal version info: %v", uerr)
 		err = uerr
+		return
+	}
+
+	if version.GitVersion == "" {
+		log.Errorf("received empty version info for pod %s", podName)
+		err = fmt.Errorf("empty version info for pod %s", podName)
 		return
 	}
 
